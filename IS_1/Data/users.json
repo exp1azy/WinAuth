@@ -1,0 +1,16 @@
+[
+  {
+    "Id": 0,
+    "Username": "ADMIN",
+    "Password": "",
+    "Blocked": false,
+    "PassRestrictions": false
+  },
+  {
+    "Id": 1,
+    "Username": "User1",
+    "Password": "000",
+    "Blocked": false,
+    "PassRestrictions": true
+  }
+]
