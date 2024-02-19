@@ -50,6 +50,7 @@
             // 
             OldPasswordTextbox.Location = new Point(12, 27);
             OldPasswordTextbox.Name = "OldPasswordTextbox";
+            OldPasswordTextbox.PasswordChar = '*';
             OldPasswordTextbox.Size = new Size(207, 23);
             OldPasswordTextbox.TabIndex = 1;
             // 
@@ -66,6 +67,7 @@
             // 
             NewPasswordTextbox.Location = new Point(12, 71);
             NewPasswordTextbox.Name = "NewPasswordTextbox";
+            NewPasswordTextbox.PasswordChar = '*';
             NewPasswordTextbox.Size = new Size(207, 23);
             NewPasswordTextbox.TabIndex = 3;
             // 
@@ -82,6 +84,7 @@
             // 
             ConfirmNewPasswordTextbox.Location = new Point(12, 115);
             ConfirmNewPasswordTextbox.Name = "ConfirmNewPasswordTextbox";
+            ConfirmNewPasswordTextbox.PasswordChar = '*';
             ConfirmNewPasswordTextbox.Size = new Size(207, 23);
             ConfirmNewPasswordTextbox.TabIndex = 5;
             // 

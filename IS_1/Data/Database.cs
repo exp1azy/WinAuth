@@ -4,33 +4,37 @@ namespace IS_1.Data
 {
     public class Database
     {
-        public string Path = "C:\\Users\\Admin\\source\\repos\\IS_1\\IS_1\\Data\\users.json";
+        public string Path = "C:\\Users\\anton\\source\\repos\\IS_1\\IS_1\\Data\\users.json";
 
-        public List<User>? GetUsers() => GetAll();
+        public List<User> GetUsers() => GetAll();
 
-        public void ChangePassword(string username, string newPassword)
+        public void ChangeUser(string userToChange, User user)
         {
             var users = GetAll();
             if (users != null)
             {
-                var currentUser = users.FirstOrDefault(u => u.Username == username);
+                var currentUser = users.FirstOrDefault(u => u.Name == userToChange);
                 if (currentUser != null)
                 {
-                    currentUser.Password = newPassword;
+                    currentUser.Name = user.Name;
+                    currentUser.Password = user.Password;
+                    currentUser.PasswordRestrictions = user.PasswordRestrictions;
+                    currentUser.IsBlocked = user.IsBlocked;
+
                     SaveChanges(users);
                 }
             }
         }
 
-        public void ChangeUsername(string usernameToChange, string newUsername)
+        public void ChangePassword(string userToChange, string newPassword)
         {
             var users = GetAll();
             if (users != null)
             {
-                var currentUser = users.FirstOrDefault(u => u.Username == usernameToChange);
+                var currentUser = users.FirstOrDefault(u => u.Name == userToChange);
                 if (currentUser != null)
                 {
-                    currentUser.Username = newUsername;
+                    currentUser.Password = newPassword;
                     SaveChanges(users);
                 }
             }
@@ -43,7 +47,7 @@ namespace IS_1.Data
             {
                 var newUser = new User
                 {
-                    Username = username,
+                    Name = username,
                     Password = password,
                     IsBlocked = isBlocked,
                     PasswordRestrictions = passRestrictions,
@@ -64,12 +68,12 @@ namespace IS_1.Data
             File.WriteAllText(Path, updatedJson);
         }
 
-        private List<User>? GetAll()
+        private List<User> GetAll()
         {
             string json = File.ReadAllText(Path);
             var users = JsonConvert.DeserializeObject<List<User>>(json);
 
-            return users;
+            return users!;
         }
     }
 }

@@ -1,33 +1,23 @@
-﻿using IS_1.Data;
-using IS_1.Models;
+﻿using IS_1.Models;
 
 namespace IS_1
 {
     public partial class Auth : Form
     {
-        private readonly Database _db;
-
-        private List<UserModel?> _users;
-        private UserModel? _currentUser = null;
+        private UserModel _loggedInUser;
+        private List<UserModel> _users;
         private int _wrongPasswordCount = 0;
 
         public Auth()
         {
             InitializeComponent();
-
-            _db = new Database();
-            _users = _db.GetUsers().Select(UserModel.ToModel).ToList();
         }
 
-        public UserModel? GetCurrentUser() => _currentUser;
+        public UserModel? GetLoggedIn() => _loggedInUser;
 
-        private void Auth_Load(object sender, EventArgs e)
+        public void SetUsers(List<UserModel> users)
         {
-            if (_users == null || _users.Count == 0)
-            {
-                MessageBox.Show("Пользователи не найдены", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
+            _users = users;
         }
 
         private void ConfirmButton_Click(object sender, EventArgs e)
@@ -35,7 +25,7 @@ namespace IS_1
             var username = UsernameTextbox.Text;
             var password = PasswordTextbox.Text;
 
-            var thisUser = _users!.FirstOrDefault(u => u.User.Username == username);
+            var thisUser = _users!.FirstOrDefault(u => u.User.Name == username);
             if (thisUser == null)
             {
                 MessageBox.Show($"Пользователь {username} не существует", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -52,14 +42,13 @@ namespace IS_1
                 }
                 else
                 {
-                    MessageBox.Show($"Введен неверный пароль для пользователя {thisUser.User.Username}", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show($"Введен неверный пароль для пользователя {thisUser.User.Name}", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
             }
 
+            _loggedInUser = thisUser;
             _wrongPasswordCount = 0;
-            thisUser.IsFirstAuth = false;
-            _currentUser = thisUser;
 
             Close();
         }

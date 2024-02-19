@@ -97,7 +97,6 @@
             Margin = new Padding(5, 6, 5, 6);
             Name = "Auth";
             Text = "Авторизация";
-            Load += Auth_Load;
             ResumeLayout(false);
             PerformLayout();
         }
