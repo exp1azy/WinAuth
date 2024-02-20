@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Configuration;
+
 namespace IS_1
 {
     internal static class Program
@@ -8,10 +10,12 @@ namespace IS_1
         [STAThread]
         static void Main()
         {
-            // To customize application configuration such as set high DPI settings or default font,
-            // see https://aka.ms/applicationconfiguration.
+             IConfiguration config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .Build();
+
             ApplicationConfiguration.Initialize();
-            Application.Run(new Main());
+            Application.Run(new Main(config));
         }
     }
 }

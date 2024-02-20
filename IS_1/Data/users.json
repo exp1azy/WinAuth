@@ -8,7 +8,7 @@
   {
     "Name": "ANTON",
     "Password": "AА,",
-    "IsBlocked": false,
+    "IsBlocked": true,
     "PasswordRestrictions": true
   },
   {
@@ -22,5 +22,11 @@
     "Password": "ZЧ.",
     "IsBlocked": false,
     "PasswordRestrictions": true
+  },
+  {
+    "Name": "AAA",
+    "Password": "",
+    "IsBlocked": false,
+    "PasswordRestrictions": false
   }
 ]

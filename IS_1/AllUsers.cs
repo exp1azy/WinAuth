@@ -1,5 +1,6 @@
 ﻿using IS_1.Data;
 using IS_1.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace IS_1
 {
@@ -11,11 +12,11 @@ namespace IS_1
         private UserModel _currentUser;
         private int _skip = 0;
 
-        public AllUsers()
+        public AllUsers(IConfiguration config)
         {
             InitializeComponent();
 
-            _db = new Database();
+            _db = new Database(config);
         }
 
         public List<UserModel> GetRefreshedUsers() => _users;

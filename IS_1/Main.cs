@@ -1,5 +1,6 @@
 ﻿using IS_1.Data;
 using IS_1.Models;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using User = IS_1.Data.User;
 
@@ -8,17 +9,19 @@ namespace IS_1
     public partial class Main : Form
     {
         private readonly Database _db;
+        private readonly IConfiguration _config;
         
         private List<UserModel> _users;
         private UserModel? _current;
 
         private const string _adminUsername = "ADMIN";
 
-        public Main()
+        public Main(IConfiguration config)
         {
             InitializeComponent();
 
-            _db = new Database();          
+            _config = config;
+            _db = new Database(config);          
 
             if (!File.Exists(_db.Path))
             {
@@ -55,13 +58,17 @@ namespace IS_1
             changePass.SetCurrentUser(_current!);
             changePass.ShowDialog();
 
-            _current!.User.Password = changePass.GetNewPassword(); 
-            _db.ChangePassword(_current.User.Name, _current.User.Password);
+            var newPass = changePass.GetNewPassword();
+            if (newPass != null)
+            {
+                _current!.User.Password = changePass.GetNewPassword();
+                _db.ChangePassword(_current.User.Name, _current.User.Password);
+            }
         }
 
         private void NewUserLabel_Click(object sender, EventArgs e)
         {
-            using var newUser = new NewUser();
+            using var newUser = new NewUser(_config);
             newUser.SetUsers(_users);
             newUser.ShowDialog();
 
@@ -70,7 +77,7 @@ namespace IS_1
 
         private void AllUsersLabel_Click(object sender, EventArgs e)
         {
-            using var allUsers = new AllUsers();
+            using var allUsers = new AllUsers(_config);
             allUsers.SetUsers(_users);
             allUsers.ShowDialog();
 

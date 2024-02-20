@@ -1,10 +1,18 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace IS_1.Data
 {
     public class Database
     {
-        public string Path = "C:\\Users\\anton\\source\\repos\\IS_1\\IS_1\\Data\\users.json";
+        private string _path;
+
+        public Database(IConfiguration config) 
+        { 
+            _path = config["DbPath"]!;
+        }
+
+        public string Path => _path;
 
         public List<User> GetUsers() => GetAll();
 

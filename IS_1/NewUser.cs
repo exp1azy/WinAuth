@@ -1,5 +1,6 @@
 ﻿using IS_1.Data;
 using IS_1.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace IS_1
 {
@@ -8,11 +9,11 @@ namespace IS_1
         private readonly Database _db;  
         private List<UserModel> _users;
 
-        public NewUser()
+        public NewUser(IConfiguration config)
         {
             InitializeComponent();
 
-            _db = new Database();
+            _db = new Database(config);
         }
 
         public List<UserModel> GetRefreshedUsers() => _users;
