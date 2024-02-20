@@ -61,7 +61,7 @@ namespace IS_1
             var newPass = changePass.GetNewPassword();
             if (newPass != null)
             {
-                _current!.User.Password = changePass.GetNewPassword();
+                _current!.User.Password = newPass;
                 _db.ChangePassword(_current.User.Name, _current.User.Password);
             }
         }
