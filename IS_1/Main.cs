@@ -11,7 +11,7 @@ namespace IS_1
     {
         private readonly Database _db;
         private readonly IConfiguration _config;
-        
+
         private List<UserModel> _users;
         private UserModel? _current;
 
@@ -22,7 +22,7 @@ namespace IS_1
             InitializeComponent();
 
             _config = config;
-            _db = new Database(config);          
+            _db = new Database(config);
 
             if (!File.Exists(_db.Path))
             {
@@ -40,26 +40,26 @@ namespace IS_1
             {
                 var result = MessageBox.Show("Пользователи не найдены", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                if (result == DialogResult.OK) 
+                if (result == DialogResult.OK)
                     Close();
-            }           
+            }
         }
 
         private void LoginButton_Click(object sender, EventArgs e)
         {
-            using var auth = new Auth();       
+            using var auth = new Auth();
             auth.SetUsers(_users);
             auth.ShowDialog();
 
             var loggedInUser = auth.GetLoggedIn();
 
-            if (loggedInUser != null) 
-                Auth(loggedInUser);           
+            if (loggedInUser != null)
+                Authenticate(loggedInUser);
         }
 
         private void ChangePassLabel_Click(object sender, EventArgs e)
         {
-            using var changePass = new ChangePassword();         
+            using var changePass = new ChangePassword();
             changePass.SetCurrentUser(_current!);
             changePass.ShowDialog();
 
@@ -81,7 +81,7 @@ namespace IS_1
 
                     _current = auth.GetLoggedIn()!;
 
-                    if (_current != null) 
+                    if (_current != null)
                         ChangeToLoggedIn();
                 }
             }
@@ -115,8 +115,8 @@ namespace IS_1
 
             var loggedInUser = auth.GetLoggedIn();
 
-            if (loggedInUser != null) 
-                Auth(loggedInUser);
+            if (loggedInUser != null)
+                Authenticate(loggedInUser);
         }
 
         private void AboutLabel_Click(object sender, EventArgs e)
@@ -125,7 +125,9 @@ namespace IS_1
             about.ShowDialog();
         }
 
-        private void Auth(UserModel loggedInUser)
+        #region Auth
+
+        private void Authenticate(UserModel loggedInUser)
         {
             if (loggedInUser != null)
             {
@@ -137,23 +139,7 @@ namespace IS_1
                 {
                     MessageBox.Show("Необходимо сменить пароль", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                    using (var changePass = new ChangePassword())
-                    {
-                        changePass.SetCurrentUser(loggedInUser);
-                        changePass.ShowDialog();
-
-                        var newPass = changePass.GetNewPassword();
-                        if (newPass != null)
-                        {
-                            loggedInUser.Password = newPass;
-                            _db.ChangePassword(loggedInUser.Name, loggedInUser.Password);
-                        }
-                    }
-
-                    passwordChanged = true;
-
-                    var userToChange = _users.First(u => u.Name == loggedInUser.Name);
-                    userToChange.Password = loggedInUser.Password;
+                    passwordChanged = ChangePassword(loggedInUser);
                 }
 
                 if (loggedInUser.PasswordRestrictions)
@@ -161,25 +147,9 @@ namespace IS_1
                     var regex = new Regex(@"^(?=.*[a-zA-Z])(?=.*[а-яА-ЯёЁ])(?=.*[^\p{L}\p{N}]).+$");
                     if (!regex.IsMatch(loggedInUser.Password))
                     {
-                        MessageBox.Show("Пароль не соответствует парольным ограничениям в связи с их установкой администратором. Смените пароль", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Information);                
+                        MessageBox.Show("Пароль не соответствует парольным ограничениям в связи с их установкой администратором. Смените пароль", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                        using (var changePass = new ChangePassword())
-                        {
-                            changePass.SetCurrentUser(loggedInUser);
-                            changePass.ShowDialog();
-
-                            var newPass = changePass.GetNewPassword();
-                            if (newPass != null)
-                            {
-                                loggedInUser.Password = newPass;
-                                _db.ChangePassword(loggedInUser.Name, loggedInUser.Password);
-                            }
-                        }
-
-                        passwordChanged = true;
-
-                        var userToChange = _users.First(u => u.Name == loggedInUser.Name);
-                        userToChange.Password = loggedInUser.Password;
+                        passwordChanged = ChangePassword(loggedInUser);
                     }
                 }
 
@@ -197,6 +167,37 @@ namespace IS_1
                 if (_current != null)
                     ChangeToLoggedIn();
             }
+        }
+
+        private bool ChangePassword(UserModel user)
+        {
+            var changedUser = OpenFormAndChangePassword(user);
+
+            SetNewPassword(changedUser);
+
+            return true;
+        }
+
+        private UserModel OpenFormAndChangePassword(UserModel user)
+        {
+            using var changePass = new ChangePassword();        
+            changePass.SetCurrentUser(user);
+            changePass.ShowDialog();
+
+            var newPass = changePass.GetNewPassword();
+            if (newPass != null)
+            {
+                user.Password = newPass;
+                _db.ChangePassword(user.Name, user.Password);
+            }
+            
+            return user;
+        }
+
+        private void SetNewPassword(UserModel user)
+        {
+            var userToChange = _users.First(u => u.Name == user.Name);
+            userToChange.Password = user.Password;
         }
 
         private void ChangeToLoggedIn()
@@ -230,6 +231,8 @@ namespace IS_1
             AllUsersLabel.Enabled = false;
             NewUserLabel.Enabled = false;
         }
+
+        #endregion
 
         #region Label focusing
 

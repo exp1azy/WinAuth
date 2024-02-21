@@ -13,8 +13,14 @@
   },
   {
     "Name": "ILYA",
-    "Password": "",
-    "IsBlocked": true,
-    "PasswordRestrictions": false
+    "Password": "QЦ,",
+    "IsBlocked": false,
+    "PasswordRestrictions": true
+  },
+  {
+    "Name": "user",
+    "Password": "qц,",
+    "IsBlocked": false,
+    "PasswordRestrictions": true
   }
 ]

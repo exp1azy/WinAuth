@@ -25,6 +25,12 @@ namespace IS_1
             var username = UsernameTextbox.Text;
             var password = PasswordTextbox.Text;
 
+            if (string.IsNullOrEmpty(username))
+            {
+                MessageBox.Show($"Введите имя пользователя", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             var thisUser = _users!.FirstOrDefault(u => u.Name == username);
             if (thisUser == null)
             {
