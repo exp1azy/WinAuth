@@ -38,18 +38,18 @@ namespace IS_1
                 return;
             }
 
-            _db.ChangeUser(_currentUser.User.Name, new User
+            _db.ChangeUser(_currentUser.Name, new User
             {
                 Name = username,
-                Password = _currentUser.User.Password,
+                Password = _currentUser.Password,
                 IsBlocked = isBlocked,
                 PasswordRestrictions = passRestrictions,
             });
 
-            var currentUser = _users.First(u => u.User.Name == _currentUser.User.Name);
-            currentUser.User.Name = username;
-            currentUser.User.IsBlocked = isBlocked;
-            currentUser.User.PasswordRestrictions = passRestrictions;
+            var currentUser = _users.First(u => u.Name == _currentUser.Name);
+            currentUser.Name = username;
+            currentUser.IsBlocked = isBlocked;
+            currentUser.PasswordRestrictions = passRestrictions;
         }
 
         private void AllUsers_Load(object sender, EventArgs e)
@@ -60,9 +60,9 @@ namespace IS_1
 
             if (firstUser != null)
             {
-                UserTextbox.Text = firstUser.User.Name;
-                BlockedCheckbox.Checked = firstUser.User.IsBlocked;
-                PassRestrictionsCheckbox.Checked = firstUser.User.PasswordRestrictions;
+                UserTextbox.Text = firstUser.Name;
+                BlockedCheckbox.Checked = firstUser.IsBlocked;
+                PassRestrictionsCheckbox.Checked = firstUser.PasswordRestrictions;
 
                 _currentUser = firstUser;
             }
@@ -78,9 +78,9 @@ namespace IS_1
 
             if (nextUser != null)
             {
-                UserTextbox.Text = nextUser.User.Name;
-                BlockedCheckbox.Checked = nextUser.User.IsBlocked;
-                PassRestrictionsCheckbox.Checked = nextUser.User.PasswordRestrictions;
+                UserTextbox.Text = nextUser.Name;
+                BlockedCheckbox.Checked = nextUser.IsBlocked;
+                PassRestrictionsCheckbox.Checked = nextUser.PasswordRestrictions;
 
                 _currentUser = nextUser;
             }

@@ -2,6 +2,7 @@
 using IS_1.Models;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using System.Text.RegularExpressions;
 using User = IS_1.Data.User;
 
 namespace IS_1
@@ -38,7 +39,9 @@ namespace IS_1
             if (_users == null || _users.Count == 0)
             {
                 var result = MessageBox.Show("Пользователи не найдены", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                if (result == DialogResult.OK) Close();
+
+                if (result == DialogResult.OK) 
+                    Close();
             }           
         }
 
@@ -49,7 +52,9 @@ namespace IS_1
             auth.ShowDialog();
 
             var loggedInUser = auth.GetLoggedIn();
-            if (loggedInUser != null) Auth(loggedInUser);           
+
+            if (loggedInUser != null) 
+                Auth(loggedInUser);           
         }
 
         private void ChangePassLabel_Click(object sender, EventArgs e)
@@ -61,8 +66,24 @@ namespace IS_1
             var newPass = changePass.GetNewPassword();
             if (newPass != null)
             {
-                _current!.User.Password = newPass;
-                _db.ChangePassword(_current.User.Name, _current.User.Password);
+                _db.ChangePassword(_current!.Name, newPass);
+
+                var userToChange = _users.First(u => u.Name == _current.Name);
+                userToChange.Password = newPass;
+
+                ChangeToLoggedOut();
+
+                using (var auth = new Auth())
+                {
+                    auth.SetUsers(_users);
+
+                    var res = auth.ShowDialog();
+
+                    _current = auth.GetLoggedIn()!;
+
+                    if (_current != null) 
+                        ChangeToLoggedIn();
+                }
             }
         }
 
@@ -86,21 +107,16 @@ namespace IS_1
 
         private void LogoutLabel_Click(object sender, EventArgs e)
         {
-            _current = null;
-
-            LoginButton.Visible = true;
-            LoggedInUsernameLabel.Visible = false;
-            ChangePassLabel.Enabled = false;
-            LogoutLabel.Enabled = false;
-            AllUsersLabel.Enabled = false;
-            NewUserLabel.Enabled = false;
+            ChangeToLoggedOut();
 
             using var auth = new Auth();
             auth.SetUsers(_users);
             auth.ShowDialog();
 
             var loggedInUser = auth.GetLoggedIn();
-            if (loggedInUser != null) Auth(loggedInUser);
+
+            if (loggedInUser != null) 
+                Auth(loggedInUser);
         }
 
         private void AboutLabel_Click(object sender, EventArgs e)
@@ -113,48 +129,106 @@ namespace IS_1
         {
             if (loggedInUser != null)
             {
-                if (loggedInUser.IsFirstAuth)
-                {
-                    using (var confirmAuth = new ConfirmAuth())
-                    {
-                        confirmAuth.ShowDialog();
+                _current = loggedInUser;
 
-                        var confirmedPassword = confirmAuth.GetConfirmedPassword();
-                        if (confirmedPassword == loggedInUser.User.Password)
+                bool passwordChanged = false;
+
+                if (string.IsNullOrEmpty(loggedInUser.Password))
+                {
+                    MessageBox.Show("Необходимо сменить пароль", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    using (var changePass = new ChangePassword())
+                    {
+                        changePass.SetCurrentUser(loggedInUser);
+                        changePass.ShowDialog();
+
+                        var newPass = changePass.GetNewPassword();
+                        if (newPass != null)
                         {
-                            confirmAuth.Close();
-                        }
-                        else
-                        {
-                            MessageBox.Show($"Введен неверный пароль для пользователя {loggedInUser.User.Name}", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            return;
+                            loggedInUser.Password = newPass;
+                            _db.ChangePassword(loggedInUser.Name, loggedInUser.Password);
                         }
                     }
 
-                    loggedInUser.IsFirstAuth = false;
+                    passwordChanged = true;
+
+                    var userToChange = _users.First(u => u.Name == loggedInUser.Name);
+                    userToChange.Password = loggedInUser.Password;
                 }
 
-                LoginButton.Visible = false;
-                LoggedInUsernameLabel.Text = $"Вы вошли под ником {loggedInUser!.User.Name}";
-                LoggedInUsernameLabel.Visible = true;
-                ChangePassLabel.Enabled = true;
-                LogoutLabel.Enabled = true;
-
-                if (loggedInUser.User.Name == _adminUsername)
+                if (loggedInUser.PasswordRestrictions)
                 {
-                    AllUsersLabel.Enabled = true;
-                    NewUserLabel.Enabled = true;
-                }
-                else
-                {
-                    AllUsersLabel.Enabled = false;
-                    NewUserLabel.Enabled = false;
+                    var regex = new Regex(@"^(?=.*[a-zA-Z])(?=.*[а-яА-ЯёЁ])(?=.*[^\p{L}\p{N}]).+$");
+                    if (!regex.IsMatch(loggedInUser.Password))
+                    {
+                        MessageBox.Show("Пароль не соответствует парольным ограничениям в связи с их установкой администратором. Смените пароль", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Information);                
+
+                        using (var changePass = new ChangePassword())
+                        {
+                            changePass.SetCurrentUser(loggedInUser);
+                            changePass.ShowDialog();
+
+                            var newPass = changePass.GetNewPassword();
+                            if (newPass != null)
+                            {
+                                loggedInUser.Password = newPass;
+                                _db.ChangePassword(loggedInUser.Name, loggedInUser.Password);
+                            }
+                        }
+
+                        passwordChanged = true;
+
+                        var userToChange = _users.First(u => u.Name == loggedInUser.Name);
+                        userToChange.Password = loggedInUser.Password;
+                    }
                 }
 
-                _current = loggedInUser;
-                var changedUser = _users.First(u => u.User.Name == _current.User.Name);
-                changedUser = _current;
+                if (passwordChanged)
+                {
+                    using (var auth = new Auth())
+                    {
+                        auth.SetUsers(_users);
+                        var res = auth.ShowDialog();
+
+                        _current = auth.GetLoggedIn()!;
+                    }
+                }
+
+                if (_current != null)
+                    ChangeToLoggedIn();
             }
+        }
+
+        private void ChangeToLoggedIn()
+        {
+            LoginButton.Visible = false;
+            LoggedInUsernameLabel.Text = $"Вы вошли под ником {_current!.Name}";
+            LoggedInUsernameLabel.Visible = true;
+            ChangePassLabel.Enabled = true;
+            LogoutLabel.Enabled = true;
+
+            if (_current.Name == _adminUsername)
+            {
+                AllUsersLabel.Enabled = true;
+                NewUserLabel.Enabled = true;
+            }
+            else
+            {
+                AllUsersLabel.Enabled = false;
+                NewUserLabel.Enabled = false;
+            }
+        }
+
+        private void ChangeToLoggedOut()
+        {
+            _current = null;
+
+            LoginButton.Visible = true;
+            LoggedInUsernameLabel.Visible = false;
+            ChangePassLabel.Enabled = false;
+            LogoutLabel.Enabled = false;
+            AllUsersLabel.Enabled = false;
+            NewUserLabel.Enabled = false;
         }
 
         #region Label focusing

@@ -25,14 +25,20 @@ namespace IS_1
             var username = UsernameTextbox.Text;
             var password = PasswordTextbox.Text;
 
-            var thisUser = _users!.FirstOrDefault(u => u.User.Name == username);
+            var thisUser = _users!.FirstOrDefault(u => u.Name == username);
             if (thisUser == null)
             {
                 MessageBox.Show($"Пользователь {username} не существует", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            if (thisUser!.User.Password != password)
+            if (thisUser.IsBlocked)
+            {
+                MessageBox.Show($"Пользователь {thisUser.Name} был заблокирован администратором", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (thisUser!.Password != password)
             {
                 _wrongPasswordCount++;
                 if (_wrongPasswordCount == 3)
@@ -42,7 +48,7 @@ namespace IS_1
                 }
                 else
                 {
-                    MessageBox.Show($"Введен неверный пароль для пользователя {thisUser.User.Name}", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show($"Введен неверный пароль для пользователя {thisUser.Name}", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
             }

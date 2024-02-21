@@ -32,7 +32,7 @@ namespace IS_1
                 return;
             }
 
-            if (_users.FirstOrDefault(u => u.User.Name == newUsername) != null)
+            if (_users.FirstOrDefault(u => u.Name == newUsername) != null)
             {
                 MessageBox.Show("Такой пользователь уже существует", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -40,15 +40,11 @@ namespace IS_1
          
             _db.AddNewUser(newUsername, string.Empty);
             _users.Add(new UserModel 
-            { 
-                IsFirstAuth = true, 
-                User = new User 
-                {
-                    Name = newUsername,
-                    Password = string.Empty,
-                    IsBlocked = false,
-                    PasswordRestrictions = false
-                } 
+            {
+                Name = newUsername,
+                Password = string.Empty,
+                IsBlocked = false,
+                PasswordRestrictions = false
             });
 
             Close();

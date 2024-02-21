@@ -4,14 +4,20 @@ namespace IS_1.Models
 {
     public class UserModel
     {
-        public User User { get; set; }
+        public string Name { get; set; }
 
-        public bool IsFirstAuth { get; set; }
+        public string Password { get; set; }
+
+        public bool IsBlocked { get; set; }
+
+        public bool PasswordRestrictions { get; set; }
 
         public static UserModel? ToModel(User? user) => user == null ? null : new UserModel
         {
-            User = user,
-            IsFirstAuth = true
+            Name = user.Name,
+            Password = user.Password,
+            IsBlocked = user.IsBlocked,
+            PasswordRestrictions = user.PasswordRestrictions
         };
     }
 }

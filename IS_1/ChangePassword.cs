@@ -26,7 +26,7 @@ namespace IS_1
             var newPass = NewPasswordTextbox.Text;
             var confirmNewPass = ConfirmNewPasswordTextbox.Text;
 
-            if (oldPass != _currentUser.User.Password)
+            if (oldPass != _currentUser.Password)
             {
                 MessageBox.Show("Неверный ввод в поле <Старый пароль>. Пароли не совпадают", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -44,7 +44,13 @@ namespace IS_1
                 return;
             }
 
-            if (_currentUser.User.PasswordRestrictions)
+            if (string.IsNullOrEmpty(newPass))
+            {
+                MessageBox.Show("Пароль не может быть пустым или состоять из пробелов", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (_currentUser.PasswordRestrictions)
             {
                 var regex = new Regex(@"^(?=.*[a-zA-Z])(?=.*[а-яА-ЯёЁ])(?=.*[^\p{L}\p{N}]).+$");
                 if (!regex.IsMatch(newPass))
