@@ -1,25 +1,13 @@
 [
   {
     "Name": "ADMIN",
-    "Password": "1",
+    "Password": "111",
     "IsBlocked": false,
     "PasswordRestrictions": false
   },
   {
-    "Name": "ANTON",
-    "Password": "QЦ,",
-    "IsBlocked": false,
-    "PasswordRestrictions": true
-  },
-  {
-    "Name": "ILYA",
-    "Password": "QЦ,",
-    "IsBlocked": false,
-    "PasswordRestrictions": true
-  },
-  {
-    "Name": "user",
-    "Password": "qц,",
+    "Name": "USER",
+    "Password": "QЙ,",
     "IsBlocked": false,
     "PasswordRestrictions": true
   }

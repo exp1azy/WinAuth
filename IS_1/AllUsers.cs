@@ -26,6 +26,18 @@ namespace IS_1
             _users = users;
         }
 
+        private void ChangeBlockVisibilityIfNeeded(UserModel user)
+        {
+            if (user.Name == Const.AdminName)
+            {
+                BlockedCheckbox.Enabled = false;
+            }
+            else
+            {
+                BlockedCheckbox.Enabled = true;
+            }
+        }
+
         private void SaveChanges()
         {
             var username = UserTextbox.Text;
@@ -35,6 +47,12 @@ namespace IS_1
             if (string.IsNullOrEmpty(username))
             {
                 MessageBox.Show("Имя пользователя не может быть пустым или состоять из пробелов", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (_users.Where(u => u != _currentUser).FirstOrDefault(u => u.Name == username) != null)
+            {
+                MessageBox.Show("Пользователь с таким ником уже существует", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -64,6 +82,8 @@ namespace IS_1
                 BlockedCheckbox.Checked = firstUser.IsBlocked;
                 PassRestrictionsCheckbox.Checked = firstUser.PasswordRestrictions;
 
+                ChangeBlockVisibilityIfNeeded(firstUser);
+
                 _currentUser = firstUser;
             }
         }
@@ -81,6 +101,8 @@ namespace IS_1
                 UserTextbox.Text = nextUser.Name;
                 BlockedCheckbox.Checked = nextUser.IsBlocked;
                 PassRestrictionsCheckbox.Checked = nextUser.PasswordRestrictions;
+
+                ChangeBlockVisibilityIfNeeded(nextUser);
 
                 _currentUser = nextUser;
             }

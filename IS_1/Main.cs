@@ -15,8 +15,6 @@ namespace IS_1
         private List<UserModel> _users;
         private UserModel? _current;
 
-        private const string _adminUsername = "ADMIN";
-
         public Main(IConfiguration config)
         {
             InitializeComponent();
@@ -26,7 +24,7 @@ namespace IS_1
 
             if (!File.Exists(_db.Path))
             {
-                var admin = new User[] { new User { Name = _adminUsername, Password = "", IsBlocked = false, PasswordRestrictions = false } };
+                var admin = new User[] { new User { Name = Const.AdminName, Password = "", IsBlocked = false, PasswordRestrictions = false } };
 
                 File.WriteAllText(_db.Path, JsonConvert.SerializeObject(admin, Formatting.Indented));
             }
@@ -202,21 +200,22 @@ namespace IS_1
 
         private void ChangeToLoggedIn()
         {
-            LoginButton.Visible = false;
-            LoggedInUsernameLabel.Text = $"Вы вошли под ником {_current!.Name}";
+            LoginButton.Visible = false;            
             LoggedInUsernameLabel.Visible = true;
             ChangePassLabel.Enabled = true;
             LogoutLabel.Enabled = true;
 
-            if (_current.Name == _adminUsername)
+            if (_current!.Name == Const.AdminName)
             {
                 AllUsersLabel.Enabled = true;
                 NewUserLabel.Enabled = true;
+                LoggedInUsernameLabel.Text = $"Вы вошли как администратор";
             }
             else
             {
                 AllUsersLabel.Enabled = false;
                 NewUserLabel.Enabled = false;
+                LoggedInUsernameLabel.Text = $"Вы вошли под ником {_current!.Name}";
             }
         }
 
