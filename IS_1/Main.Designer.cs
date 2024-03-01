@@ -196,6 +196,7 @@
             Name = "Main";
             Text = "Программа";
             Load += Main_Load;
+            FormClosing += Main_FormClosing;
             TabControl.ResumeLayout(false);
             UsersTabPage.ResumeLayout(false);
             UsersTabPage.PerformLayout();
@@ -203,7 +204,7 @@
             RefTabPage.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
-        }
+        }       
 
         #endregion
 

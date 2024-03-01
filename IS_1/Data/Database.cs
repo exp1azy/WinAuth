@@ -76,12 +76,19 @@ namespace IS_1.Data
             File.WriteAllText(Path, updatedJson);
         }
 
-        private List<User> GetAll()
+        private List<User>? GetAll()
         {
             string json = File.ReadAllText(Path);
-            var users = JsonConvert.DeserializeObject<List<User>>(json);
 
-            return users!;
+            try
+            {
+                var users = JsonConvert.DeserializeObject<List<User>>(json);
+                return users!;
+            }
+            catch (Exception)
+            {
+                return null;
+            }           
         }
     }
 }

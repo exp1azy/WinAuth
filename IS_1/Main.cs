@@ -1,6 +1,7 @@
 ﻿using IS_1.Data;
 using IS_1.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.VisualBasic.ApplicationServices;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 using User = IS_1.Data.User;
@@ -14,6 +15,7 @@ namespace IS_1
 
         private List<UserModel> _users;
         private UserModel? _current;
+        private string _passphrase;
 
         public Main(IConfiguration config)
         {
@@ -21,6 +23,23 @@ namespace IS_1
 
             _config = config;
             _db = new Database(config);
+        }
+
+        private void EncryptAndDeleteTemp()
+        {
+            var cryptoHandler = new CryptoHandler(_config);
+
+            cryptoHandler.EncryptDecryptCredentials(_passphrase, true);
+            cryptoHandler.DeleteTempFile();
+        }
+
+        private void Main_Load(object sender, EventArgs e)
+        {            
+            using (var passphrase = new Passphrase(_config))
+            {
+                passphrase.ShowDialog();
+                _passphrase = passphrase.Pass;
+            }
 
             if (!File.Exists(_db.Path))
             {
@@ -28,19 +47,23 @@ namespace IS_1
 
                 File.WriteAllText(_db.Path, JsonConvert.SerializeObject(admin, Formatting.Indented));
             }
+           
+            if (_db.GetUsers() == null)
+            {
+                MessageBox.Show("Введена неверная парольная фраза", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-            _users = _db.GetUsers()!.Select(UserModel.ToModel).ToList()!;
+                EncryptAndDeleteTemp();
+                Close();
+            }
+            else
+            {
+                _users = _db.GetUsers().Select(UserModel.ToModel).ToList()!;
+            }            
         }
 
-        private void Main_Load(object sender, EventArgs e)
+        private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (_users == null || _users.Count == 0)
-            {
-                var result = MessageBox.Show("Пользователи не найдены", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                if (result == DialogResult.OK)
-                    Close();
-            }
+            EncryptAndDeleteTemp();
         }
 
         private void LoginButton_Click(object sender, EventArgs e)
