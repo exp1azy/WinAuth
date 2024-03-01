@@ -4,4 +4,4 @@
 
 Методичка: [Лабораторная работа 1.pdf](https://github.com/exp1azy/WinAuth/files/14335963/1.pdf)
 
-***Пароль для дешифрации учетных данных: 123***, также необходимо поменять путь до файлов <u>users.json</u> и <u>encryptedUsers.bin</u> в файле конфигурации <u>appsettings.json<u/>
+> ***Пароль для дешифрации учетных данных: 123***, также необходимо поменять путь до файлов users.json и encryptedUsers.bin в файле конфигурации appsettings.json
