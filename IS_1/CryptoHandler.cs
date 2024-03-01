@@ -26,8 +26,8 @@ namespace IS_1
                 aes.Mode = CipherMode.CFB;
                 aes.Padding = PaddingMode.None;
 
-                string sourceFileName = (encrypt ? _config["DbPath"] : _config["Encrypted"])!;
-                string destinationFileName = (encrypt ? _config["Encrypted"] : _config["DbPath"])!;
+                string sourceFileName = (encrypt ? _config["DbPath"] : _config["EncryptedDbPath"])!;
+                string destinationFileName = (encrypt ? _config["EncryptedDbPath"] : _config["DbPath"])!;
 
                 using (FileStream sourceFileStream = new FileStream(sourceFileName, FileMode.OpenOrCreate))
                 using (FileStream destinationFileStream = new FileStream(destinationFileName, FileMode.OpenOrCreate))
