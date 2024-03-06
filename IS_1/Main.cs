@@ -11,10 +11,10 @@ namespace IS_1
     {
         private readonly Database _db;
         private readonly IConfiguration _config;
+        private readonly CryptoHandler _cryptoHandler;
 
         private List<UserModel> _users;
         private UserModel? _current;
-        private string _passphrase;
 
         public Main(IConfiguration config)
         {
@@ -22,14 +22,7 @@ namespace IS_1
 
             _config = config;
             _db = new Database(config);
-        }
-
-        private void EncryptAndDeleteTemp()
-        {
-            var cryptoHandler = new CryptoHandler(_config);
-
-            cryptoHandler.EncryptDecryptCredentials(_passphrase, true);
-            cryptoHandler.DeleteTempFile();
+            _cryptoHandler = new CryptoHandler(config);
         }
 
         private void Main_Load(object sender, EventArgs e)
@@ -37,7 +30,6 @@ namespace IS_1
             using (var passphrase = new Passphrase(_config))
             {
                 passphrase.ShowDialog();
-                _passphrase = passphrase.Pass;
             }
 
             if (!File.Exists(_db.Path))
@@ -49,9 +41,8 @@ namespace IS_1
            
             if (_db.GetUsers() == null)
             {
-                MessageBox.Show("Введена неверная парольная фраза", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Не удалось расшифровать файл", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                EncryptAndDeleteTemp();
                 Close();
             }
             else
@@ -62,7 +53,15 @@ namespace IS_1
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
-            EncryptAndDeleteTemp();
+            try 
+            { 
+                _cryptoHandler.EncryptDecrypt(true); 
+            }
+            catch { }
+            finally 
+            { 
+                _cryptoHandler.DeleteTempFile(); 
+            }           
         }
 
         private void LoginButton_Click(object sender, EventArgs e)

@@ -6,16 +6,12 @@ namespace IS_1
     {
         private readonly IConfiguration _config;
 
-        private string _pass;
-
         public Passphrase(IConfiguration config)
         {
             InitializeComponent();
 
             _config = config;
         }
-
-        public string Pass => _pass;
 
         private void PassphraseButton_Click(object sender, EventArgs e)
         {
@@ -27,11 +23,18 @@ namespace IS_1
                 return;
             }
 
-            _pass = passphrase;
-
             var cryptoHandler = new CryptoHandler(_config);
-            
-            cryptoHandler.EncryptDecryptCredentials(passphrase, false);
+
+            var isCorrect = cryptoHandler.CheckPassword(passphrase);
+            if (isCorrect)
+            {
+                cryptoHandler.EncryptDecrypt(false);
+            }
+            else
+            {
+                MessageBox.Show("Неверная парольная фраза", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
             Close();
         }
