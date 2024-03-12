@@ -15,6 +15,7 @@ namespace IS_1
 
         private List<UserModel> _users;
         private UserModel? _current;
+        private string _passphrase;
 
         public Main(IConfiguration config)
         {
@@ -26,23 +27,16 @@ namespace IS_1
         }
 
         private void Main_Load(object sender, EventArgs e)
-        {            
+        {
             using (var passphrase = new Passphrase(_config))
             {
                 passphrase.ShowDialog();
+                _passphrase = passphrase.Password;
             }
-
-            if (!File.Exists(_db.Path))
-            {
-                var admin = new User[] { new User { Name = Const.AdminName, Password = "", IsBlocked = false, PasswordRestrictions = false } };
-
-                File.WriteAllText(_db.Path, JsonConvert.SerializeObject(admin, Formatting.Indented));
-            }
-           
+                    
             if (_db.GetUsers() == null)
             {
                 MessageBox.Show("Не удалось расшифровать файл", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
                 Close();
             }
             else
@@ -53,15 +47,8 @@ namespace IS_1
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
-            try 
-            { 
-                _cryptoHandler.EncryptDecrypt(true); 
-            }
-            catch { }
-            finally 
-            { 
-                _cryptoHandler.DeleteTempFile(); 
-            }           
+            _cryptoHandler.Encrypt(_passphrase);
+            _cryptoHandler.DeleteTemp();
         }
 
         private void LoginButton_Click(object sender, EventArgs e)

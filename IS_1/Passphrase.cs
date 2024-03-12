@@ -6,6 +6,8 @@ namespace IS_1
     {
         private readonly IConfiguration _config;
 
+        private string _password;
+
         public Passphrase(IConfiguration config)
         {
             InitializeComponent();
@@ -13,28 +15,31 @@ namespace IS_1
             _config = config;
         }
 
+        public string Password => _password;
+
         private void PassphraseButton_Click(object sender, EventArgs e)
         {
             var passphrase = PassphraseTextbox.Text;
 
             if (string.IsNullOrEmpty(passphrase))
             {
-                MessageBox.Show($"Введите парольную фразу", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Введите парольную фразу", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             var cryptoHandler = new CryptoHandler(_config);
 
-            var isCorrect = cryptoHandler.CheckPassword(passphrase);
-            if (isCorrect)
+            try
             {
-                cryptoHandler.EncryptDecrypt(false);
+                cryptoHandler.Decrypt(passphrase);
             }
-            else
+            catch
             {
                 MessageBox.Show("Неверная парольная фраза", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+
+            _password = passphrase;
 
             Close();
         }

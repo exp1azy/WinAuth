@@ -49,7 +49,7 @@ namespace IS_1
                 _wrongPasswordCount++;
                 if (_wrongPasswordCount == 3)
                 {
-                    MessageBox.Show($"Вы 3 раза ввели неверный пароль!", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Вы 3 раза ввели неверный пароль!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     Application.Exit();
                 }
                 else
