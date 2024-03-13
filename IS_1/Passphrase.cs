@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System.Security.Cryptography;
 
 namespace IS_1
 {
@@ -33,7 +34,12 @@ namespace IS_1
             {
                 cryptoHandler.Decrypt(passphrase);
             }
-            catch
+            catch (DirectoryNotFoundException ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            catch (CryptographicException)
             {
                 MessageBox.Show("Неверная парольная фраза", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
